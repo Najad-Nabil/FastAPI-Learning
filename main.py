@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi import HTTPException
 from models import Product
 
 app = FastAPI()
@@ -23,9 +24,18 @@ def view_one_product(product_id: int):
     for product in products:
         if product_id == product.id:
             return product
-    return "product not found"
+    raise HTTPException(status_code=404, detail="Product not found")
 
 @app.post("/product/add-product")
-def add_product(id: int, name: str, description: str, price: float, quantity: int):
-    products.append(Product(id =id, name = name, description = description, price = price, quantity = quantity))
-    return view_one_product(id)
+def add_product(product: Product):
+    products.append(product)
+    return product
+
+@app.put("/product/update")
+def update_product(id: int, product: Product):
+    for i in range(len(products)):
+        if products[i].id == id:
+            products[i] = product
+            return products[i]
+        
+
