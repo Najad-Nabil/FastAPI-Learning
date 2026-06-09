@@ -23,6 +23,7 @@ function App() {
   const [filter, setFilter] = useState("");
   const [sortField, setSortField] = useState("id");
   const [sortDirection, setSortDirection] = useState("asc");
+  const [showForm, setShowForm] = useState(false);
 
   // Auto-dismiss messages after 5 seconds
   useEffect(() => {
@@ -194,177 +195,243 @@ function App() {
   const currency = (n) =>
     typeof n === "number" ? n.toFixed(2) : Number(n || 0).toFixed(2);
 
+  const handleCloseForm = () => {
+    setShowForm(false);
+    resetForm();
+    setMessage("");
+    setError("");
+  };
+
   return (
-    <div className="app-bg">
-      <header className="topbar">
-        <div className="brand">
-          <span className="brand-badge">📦</span>
-          <h1>Telusko Trac</h1>
-        </div>
-        <div className="top-actions">
-          <button className="btn btn-light" onClick={fetchProducts} disabled={loading}>
-            Refresh
+    <div className="app-container">
+      {/* Navigation Header */}
+      <nav className="navbar">
+        <div className="navbar-content">
+          <div className="navbar-brand">
+            <span className="brand-icon">📦</span>
+            <div className="brand-text">
+              <h1>Telusko Trac</h1>
+              <p>Product Management System</p>
+            </div>
+          </div>
+          <button 
+            className="btn-add-product" 
+            onClick={() => setShowForm(true)}
+            disabled={loading}
+          >
+            + Add Product
           </button>
         </div>
-      </header>
+      </nav>
 
-      <div className="container">
-        <div className="stats">
-          <div className="chip">Total: {products.length}</div>
-          <div className="search">
-            <input
-              type="text"
-              placeholder="Search by id, name or description..."
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-            />
-          </div>
+      {/* Hero Section */}
+      <section className="hero">
+        <div className="hero-content">
+          <h2>Manage Your Products</h2>
+          <p>Organize, track, and control your inventory with ease</p>
         </div>
+      </section>
 
-        <div className="content-grid">
-          <div className="card form-card">
-            <h2>{editId ? "Edit Product" : "Add Product"}</h2>
-            <form onSubmit={handleSubmit} className="product-form">
-              <input
-                type="number"
-                name="id"
-                placeholder="ID"
-                value={form.id}
-                onChange={handleChange}
-                required
-                disabled={!!editId}
-              />
-              <input
-                type="text"
-                name="name"
-                placeholder="Name"
-                value={form.name}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="text"
-                name="description"
-                placeholder="Description"
-                value={form.description}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="number"
-                name="price"
-                placeholder="Price"
-                value={form.price}
-                onChange={handleChange}
-                required
-                step="0.01"
-              />
-              <input
-                type="number"
-                name="quantity"
-                placeholder="Quantity"
-                value={form.quantity}
-                onChange={handleChange}
-                required
-              />
-              <div className="form-actions">
-                <button className="btn" type="submit" disabled={loading}>
-                  {editId ? "Update" : "Add"}
-                </button>
-                {editId && (
-                  <button
-                    className="btn btn-secondary"
-                    type="button"
-                    onClick={() => {
-                      resetForm();
-                      setMessage("");
-                      setError("");
-                    }}
-                  >
-                    Cancel
-                  </button>
-                )}
-              </div>
-            </form>
-            {message && <div className="success-msg">{message}</div>}
-            {error && <div className="error-msg">{error}</div>}
-          </div>
-          
-          <TaglineSection />
-
-          <div className="card list-card">
-            <h2>Products</h2>
-            {loading ? (
-              <div className="loader">Loading...</div>
-            ) : (
-              <div className="scroll-x">
-                <table className="product-table">
-                  <thead>
-                    <tr>
-                      <th 
-                        className={`sortable ${sortField === 'id' ? `sort-${sortDirection}` : ''}`}
-                        onClick={() => handleSort('id')}
-                      >
-                        ID
-                      </th>
-                      <th 
-                        className={`sortable ${sortField === 'name' ? `sort-${sortDirection}` : ''}`}
-                        onClick={() => handleSort('name')}
-                      >
-                        Name
-                      </th>
-                      <th>Description</th>
-                      <th 
-                        className={`sortable ${sortField === 'price' ? `sort-${sortDirection}` : ''}`}
-                        onClick={() => handleSort('price')}
-                      >
-                        Price
-                      </th>
-                      <th 
-                        className={`sortable ${sortField === 'quantity' ? `sort-${sortDirection}` : ''}`}
-                        onClick={() => handleSort('quantity')}
-                      >
-                        Quantity
-                      </th>
-                      <th>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredProducts.map((p) => (
-                      <tr key={p.id}>
-                        <td>{p.id}</td>
-                        <td className="name-cell">{p.name}</td>
-                        <td className="desc-cell" title={p.description}>{p.description}</td>
-                        <td className="price-cell">${currency(p.price)}</td>
-                        <td>
-                          <span className="qty-badge">{p.quantity}</span>
-                        </td>
-                        <td>
-                          <div className="row-actions">
-                            <button className="btn btn-edit" onClick={() => handleEdit(p)}>
-                              Edit
-                            </button>
-                            <button className="btn btn-delete" onClick={() => handleDelete(p.id)}>
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                    {filteredProducts.length === 0 && (
-                      <tr>
-                        <td colSpan={6} className="empty">
-                          No products found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+      {/* Search & Filter Bar */}
+      <div className="search-section">
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="🔍 Search by ID, name, or description..."
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="search-input"
+          />
+          <button 
+            className="btn-refresh" 
+            onClick={() => {
+              fetchProducts();
+            }}
+            disabled={loading}
+            title="Refresh products"
+          >
+            ↻
+          </button>
+        </div>
+        <div className="stats-badge">
+          <span className="stat-item">
+            <strong>Total:</strong> {products.length}
+          </span>
+          <span className="stat-item">
+            <strong>Displayed:</strong> {filteredProducts.length}
+          </span>
         </div>
       </div>
+
+      {/* Modal Form Overlay */}
+      {showForm && (
+        <div className="modal-overlay" onClick={handleCloseForm}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{editId ? "Edit Product" : "Add New Product"}</h2>
+              <button className="btn-close" onClick={handleCloseForm}>✕</button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="modal-form">
+              <div className="form-group">
+                <label>Product ID</label>
+                <input
+                  type="number"
+                  name="id"
+                  placeholder="Enter product ID"
+                  value={form.id}
+                  onChange={handleChange}
+                  required
+                  disabled={!!editId}
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Product Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Enter product name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Description</label>
+                <input
+                  type="text"
+                  name="description"
+                  placeholder="Enter product description"
+                  value={form.description}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              
+              <div className="form-row">
+                <div className="form-group">
+                  <label>Price</label>
+                  <input
+                    type="number"
+                    name="price"
+                    placeholder="0.00"
+                    value={form.price}
+                    onChange={handleChange}
+                    required
+                    step="0.01"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <label>Quantity</label>
+                  <input
+                    type="number"
+                    name="quantity"
+                    placeholder="0"
+                    value={form.quantity}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="form-actions">
+                <button 
+                  className="btn btn-submit" 
+                  type="submit" 
+                  disabled={loading}
+                >
+                  {editId ? "Update Product" : "Create Product"}
+                </button>
+                <button
+                  className="btn btn-cancel"
+                  type="button"
+                  onClick={handleCloseForm}
+                >
+                  Cancel
+                </button>
+              </div>
+
+              {message && <div className="success-msg">{message}</div>}
+              {error && <div className="error-msg">{error}</div>}
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <main className="main-content">
+        {/* Products Grid */}
+        <div className="products-grid">
+          {loading && !filteredProducts.length ? (
+            <div className="loading-state">
+              <div className="loader"></div>
+              <p>Loading products...</p>
+            </div>
+          ) : filteredProducts.length === 0 ? (
+            <div className="empty-state">
+              <div className="empty-icon">📭</div>
+              <h3>No products found</h3>
+              <p>Try adjusting your search or create a new product</p>
+            </div>
+          ) : (
+            filteredProducts.map((product) => (
+              <div key={product.id} className="product-card">
+                <div className="card-header">
+                  <span className="product-id">#{product.id}</span>
+                  <span className={`stock-badge ${product.quantity > 10 ? 'in-stock' : product.quantity > 0 ? 'low-stock' : 'out-stock'}`}>
+                    {product.quantity > 0 ? '✓ In Stock' : '✗ Out'}
+                  </span>
+                </div>
+                
+                <div className="card-body">
+                  <h3 className="product-name">{product.name}</h3>
+                  <p className="product-desc">{product.description}</p>
+                  
+                  <div className="product-info">
+                    <div className="info-item">
+                      <span className="label">Price</span>
+                      <span className="value price">${currency(product.price)}</span>
+                    </div>
+                    <div className="info-item">
+                      <span className="label">Stock</span>
+                      <span className="value qty">{product.quantity} units</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="card-footer">
+                  <button 
+                    className="btn btn-edit-card"
+                    onClick={() => {
+                      handleEdit(product);
+                      setShowForm(true);
+                    }}
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button 
+                    className="btn btn-delete-card"
+                    onClick={() => handleDelete(product.id)}
+                  >
+                    🗑️ Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Tagline Section */}
+        <TaglineSection />
+      </main>
+
+      {/* Footer */}
+      <footer className="footer">
+        <p>&copy; 2026 Telusko Trac. Inventory Management System.</p>
+      </footer>
     </div>
   );
 }
