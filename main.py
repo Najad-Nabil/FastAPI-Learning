@@ -1,8 +1,9 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi import HTTPException
 from models import Product
 from config import SessionLocal, engine
 import database_schema
+from sqlalchemy.orm import Session
 
 app = FastAPI()
 
@@ -28,22 +29,29 @@ def init_db():
         db.commit()
 init_db()
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 @app.get("/product")
-def view_products():
-    # db = SessionLocal()
-    # db.query()
-    return products
+def view_products(db: Session = Depends(get_db)):
+    db_products = db.query(database_schema.ProductDB).all()
+    return db_products
 
 @app.get("/product/{product_id}")
-def view_one_product(product_id: int):
-    for product in products:
-        if product_id == product.id:
-            return product
+def view_one_product(product_id: int, db: Session = Depends(get_db)):
+    db_product = db.query(database_schema.ProductDB).filter(database_schema.ProductDB.id == product_id).first()
+    if db_product:
+        return db_product
     raise HTTPException(status_code=404, detail="Product not found")
 
 @app.post("/product/add-product")
-def add_product(product: Product):
-    products.append(product)
+def add_product(product: Product, db: Session = Depends(get_db)):
+    db.add(database_schema.ProductDB(**product.model_dump()))
+    db.commit()
     return product
 
 @app.put("/product/update")
