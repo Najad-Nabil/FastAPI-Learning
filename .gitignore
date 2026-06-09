@@ -1,6 +1,6 @@
 node_modules/
 myenv/
 __pycache__/
-
+frontend/.env
 *.pyc
 .env
