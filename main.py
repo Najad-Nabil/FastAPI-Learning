@@ -13,7 +13,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://localhost:5173",
-        "http://fast-api-learning-hazel.vercel.app/"
+        "https://fast-api-learning-ejw21c7fj-najad-nabil-s-projects.vercel.app"
     ],
     allow_methods=["*"],
     allow_headers=["*"],
