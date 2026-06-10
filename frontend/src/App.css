@@ -241,7 +241,7 @@ body {
 
 .stats-badge {
   display: flex;
-  gap: 2rem;
+  gap: 3.5rem;
   padding: 1rem 1.5rem;
   background: var(--surface);
   border-radius: 12px;
