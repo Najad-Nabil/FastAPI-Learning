@@ -210,7 +210,7 @@ function App() {
           <div className="navbar-brand">
             <span className="brand-icon">📦</span>
             <div className="brand-text">
-              <h1>Telusko Trac</h1>
+              <h1>Fast API</h1>
               <p>Product Management System</p>
             </div>
           </div>
@@ -430,7 +430,7 @@ function App() {
 
       {/* Footer */}
       <footer className="footer">
-        <p>&copy; 2026 Telusko Trac. Inventory Management System.</p>
+        <p>&copy; Inventory Management System.</p>
       </footer>
     </div>
   );
